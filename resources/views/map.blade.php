@@ -25,41 +25,29 @@
                 textBaseline: 'middle',
                 font: 'Courier New',
                 text: feature.get('name'),
-                fill: new ol.style.Fill({color: feature.get('color')}),
-                stroke: new ol.style.Stroke({color: '#ffffff', width: 3}),
+                fill: new ol.style.Fill({ color: feature.get('color') }),
+                stroke: new ol.style.Stroke({ color: '#ffffff', width: 3 }),
                 offsetX: 0,
                 offsetY: 0,
                 rotation: 0
             })
         });
     }
-
-    var vectorLines = new ol.layer.Vector({
-        source: new ol.source.Vector({
-            url: '/api/geojson/lines',
-            format: new ol.format.GeoJSON({
-                defaultDataProjection :'RAIL:LINES',
-                projection: 'RAIL:LINES'
-            })
-        }),
-        style: lineStyleFunction
-    });
-
 
     function pointStyleFunction(feature, resolution) {
         return new ol.style.Style({
             image: new ol.style.Circle({
                 radius: 5,
                 fill: null,
-                stroke: new ol.style.Stroke({color: 'red', width: 5})
+                stroke: new ol.style.Stroke({ color: 'red', width: 5 })
             }),
             text: new ol.style.Text({
                 textAlign: 'center',
                 textBaseline: 'middle',
                 font: 'Arial',
                 text: feature.get('name'),
-                fill: new ol.style.Fill({color: '#aa3300'}),
-                stroke: new ol.style.Stroke({color: '#ffffff', width: 3}),
+                fill: new ol.style.Fill({ color: '#aa3300' }),
+                stroke: new ol.style.Stroke({ color: '#ffffff', width: 3 }),
                 offsetX: 0,
                 offsetY: 0,
                 rotation: 0
@@ -67,24 +55,31 @@
         });
     }
 
-    var vectorPoints = new ol.layer.Vector({
-        source: new ol.source.Vector({
-            url: '/api/geojson/stations',
-            format: new ol.format.GeoJSON({
-                defaultDataProjection :'RAIL:STATIONS',
-                projection: 'RAIL:STATIONS'
-            })
-        }),
-        style: pointStyleFunction
-    });
-
     var map = new ol.Map({
         layers: [
             new ol.layer.Tile({
-                source: new ol.source.MapQuest({layer: 'osm'})
+                source: new ol.source.MapQuest({ layer: 'osm' })
             }),
-            vectorLines,
-            vectorPoints
+            new ol.layer.Vector({
+                source: new ol.source.Vector({
+                    url: '/api/geojson/lines',
+                    format: new ol.format.GeoJSON({
+                        defaultDataProjection: 'RAIL:LINES',
+                        projection: 'RAIL:LINES'
+                    })
+                }),
+                style: lineStyleFunction
+            }),
+            new ol.layer.Vector({
+                source: new ol.source.Vector({
+                    url: '/api/geojson/stations',
+                    format: new ol.format.GeoJSON({
+                        defaultDataProjection: 'RAIL:STATIONS',
+                        projection: 'RAIL:STATIONS'
+                    })
+                }),
+                style: pointStyleFunction
+            })
         ],
         target: 'map',
         view: new ol.View({
