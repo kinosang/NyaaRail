@@ -11,8 +11,8 @@
 |
  */
 
-$app->get('/', function () use ($app) {
-    return $app->version();
+$app->get('/', function () {
+    return view('map');
 });
 
 $app->get('/api/lines', function () {
@@ -23,8 +23,79 @@ $app->get('/api/lines/{line_id}', function ($line_id) {
     return \App\Line::with('stations')->find($line_id);
 });
 
+$app->get('/api/geojson/lines', function () {
+    $lines = \App\Line::with('stations')->get();
+
+    $geoArray = [
+        'type'     => 'FeatureCollection',
+        'crs'      => [
+            'type'       => 'name',
+            'properties' => [
+                'name' => 'RAIL:LINES',
+            ],
+        ],
+        'features' => [],
+    ];
+
+    foreach ($lines as $line) {
+        $line_coordinates = [];
+        foreach ($line->stations as $station_no => $station) {
+            if ($station_no >= 0 && $station_no < count($line->stations) - 1) {
+                $line_coordinates[] = [
+                    explode(',', $station->coordinate),
+                    explode(',', $line->stations[$station_no + 1]->coordinate),
+                ];
+            }
+        }
+
+        $geoArray['features'][] = [
+            'type'       => 'Feature',
+            'geometry'   => [
+                'type'        => 'MultiLineString',
+                'coordinates' => $line_coordinates,
+            ],
+            'properties' => [
+                'name' => $line->name,
+            ],
+        ];
+    }
+
+    return $geoArray;
+});
+
 $app->get('/api/stations', function () {
     return \App\Station::get();
+});
+
+$app->get('/api/geojson/stations', function () {
+    $stations = \App\Station::get();
+
+    $geoArray = [
+        'type'     => 'FeatureCollection',
+        'crs'      => [
+            'type'       => 'name',
+            'properties' => [
+                'name' => 'RAIL:STATIONS',
+            ],
+        ],
+        'features' => [],
+    ];
+
+    foreach ($stations as $station) {
+        list($axis_x, $axis_y)  = explode(',', $station->coordinate);
+        $geoArray['features'][] = [
+            'type'       => 'Feature',
+            'geometry'   => [
+                'type'        => 'Point',
+                "coordinates" => [$axis_x, $axis_y],
+            ],
+            "properties" => [
+                "name" => $station->name,
+            ],
+        ];
+    }
+
+    return $geoArray;
 });
 
 $app->get('/api/link/{station_id_start},{station_id_goal}', function ($station_id_start, $station_id_goal) {
