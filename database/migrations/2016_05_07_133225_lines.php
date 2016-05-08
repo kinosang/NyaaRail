@@ -15,6 +15,7 @@ class Lines extends Migration
         Schema::create('lines', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
+            $table->string('color')->default('green');
             $table->timestamps();
         });
     }

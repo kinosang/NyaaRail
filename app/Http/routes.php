@@ -55,7 +55,8 @@ $app->get('/api/geojson/lines', function () {
                 'coordinates' => $line_coordinates,
             ],
             'properties' => [
-                'name' => $line->name,
+                'name'  => $line->name,
+                'color' => $line->color,
             ],
         ];
     }

@@ -15,18 +15,17 @@
     <script src="ol.js" type="text/javascript"></script>
     <script>
     function lineStyleFunction(feature, resolution) {
-        console.log(feature);
         return new ol.style.Style({
             stroke: new ol.style.Stroke({
-                color: 'green',
+                color: feature.get('color'),
                 width: 5
             }),
             text: new ol.style.Text({
                 textAlign: 'center',
                 textBaseline: 'middle',
                 font: 'Courier New',
-                text: 'wrap',
-                fill: new ol.style.Fill({color: 'green'}),
+                text: feature.get('name'),
+                fill: new ol.style.Fill({color: feature.get('color')}),
                 stroke: new ol.style.Stroke({color: '#ffffff', width: 3}),
                 offsetX: 0,
                 offsetY: 0,
@@ -50,7 +49,7 @@
     function pointStyleFunction(feature, resolution) {
         return new ol.style.Style({
             image: new ol.style.Circle({
-                radius: 10,
+                radius: 5,
                 fill: null,
                 stroke: new ol.style.Stroke({color: 'red', width: 5})
             }),
@@ -58,7 +57,7 @@
                 textAlign: 'center',
                 textBaseline: 'middle',
                 font: 'Arial',
-                text: 'shorten',
+                text: feature.get('name'),
                 fill: new ol.style.Fill({color: '#aa3300'}),
                 stroke: new ol.style.Stroke({color: '#ffffff', width: 3}),
                 offsetX: 0,
@@ -76,7 +75,7 @@
                 projection: 'RAIL:STATIONS'
             })
         }),
-        //style: pointStyleFunction
+        style: pointStyleFunction
     });
 
     var map = new ol.Map({
