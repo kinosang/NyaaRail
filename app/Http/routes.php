@@ -119,3 +119,47 @@ $app->get('/api/link/{station_id_start},{station_id_goal}', function ($station_i
         return ['error' => '404'];
     }
 });
+
+$app->get('/api/geojson/link/{station_id_start},{station_id_goal}', function ($station_id_start, $station_id_goal) {
+    $start = new \App\SNode($station_id_start);
+    $goal  = new \App\SNode($station_id_goal);
+
+    $aStar = new \App\RAStar();
+
+    $solution = $aStar->run($start, $goal);
+
+    if ($solution) {
+        $line_coordinates = [];
+
+        foreach ($solution as $station_no => $node) {
+            if ($station_no >= 0 && $station_no < count($solution) - 1) {
+                $line_coordinates[] = [
+                    [$node->getX(), $node->getY()],
+                    [$solution[$station_no + 1]->getX(), $solution[$station_no + 1]->getY()],
+                ];
+            }
+        }
+
+        return [
+            'type'     => 'FeatureCollection',
+            'crs'      => [
+                'type'       => 'name',
+                'properties' => [
+                    'name' => 'RAIL:LINK',
+                ],
+            ],
+            'features' => [[
+                'type'       => 'Feature',
+                'geometry'   => [
+                    'type'        => 'MultiLineString',
+                    'coordinates' => $line_coordinates,
+                ],
+                'properties' => [
+                    'name' => 'LINK',
+                ],
+            ]],
+        ];;
+    } else {
+        return ['error' => '404'];
+    }
+});
