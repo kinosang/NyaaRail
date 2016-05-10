@@ -42,8 +42,8 @@ $app->get('/api/geojson/lines', function () {
         foreach ($line->stations as $station_no => $station) {
             if ($station_no >= 0 && $station_no < count($line->stations) - 1) {
                 $line_coordinates[] = [
-                    explode(',', $station->coordinate),
-                    explode(',', $line->stations[$station_no + 1]->coordinate),
+                    array_map('floatval', explode(',', $station->coordinate)),
+                    array_map('floatval', explode(',', $line->stations[$station_no + 1]->coordinate)),
                 ];
             }
         }
@@ -55,6 +55,7 @@ $app->get('/api/geojson/lines', function () {
                 'coordinates' => $line_coordinates,
             ],
             'properties' => [
+                'index' => sizeof($geoArray['features']),
                 'name'  => $line->name,
                 'color' => $line->color,
             ],
